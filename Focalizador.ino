@@ -49,8 +49,8 @@ Button2 b;
 RotaryEncoder *encoder = nullptr;
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 /////////////////////////////////////////////////////////////////
-int posicao;
-int microsteps=1;
+int position;
+int precision=1;
 unsigned long now = 0;
 unsigned long lastTrigger = 0;
 void setup() {
@@ -58,7 +58,7 @@ encoder = new RotaryEncoder(PIN_IN1, PIN_IN2, RotaryEncoder::LatchMode::TWO03);
    // Declare pins as output:
   pinMode(enablePin, OUTPUT);
   digitalWrite(enablePin, HIGH);
-  posicao = 0;
+  position = 0;
   stepper.setEnablePin();  
   stepper.setMaxSpeed(1000);
   stepper.setCurrentPosition(0);
@@ -92,7 +92,7 @@ void loop() {
     Serial.print(" dir:");
     Serial.println(newDir);
     pos = newPos;
-    stepper.moveTo(newPos * microsteps);
+    stepper.moveTo(newPos * precision);
     doStep();
   }else{ 
     doStep();
@@ -120,26 +120,27 @@ IRAM_ATTR void rotate() {
 
  
 void click(Button2& btn) {
-  if(microsteps==1){
-    microsteps=8;
-  }else if(microsteps==8){
-    microsteps=16;
-  }else if(microsteps==16){
-    microsteps=32;
-  }else if(microsteps==32){
-    microsteps=1;
+  if(precision==1){
+    precision=8;
+  }else if(precision==8){
+    precision=16;
+  }else if(precision==16){
+    precision=32;
+  }else if(precision==32){
+    precision=1;
   }else {
-     microsteps=1;
+     precision=1;
   }
-  
-  Serial.print("MicroSteps:");
-  Serial.println(microsteps);
+  resetPosition(btn);
+  Serial.print("precision:");
+  Serial.println(precision);
 }
 
 // long click
 void resetPosition(Button2& btn) {
-  posicao = 0;
-  stepper.setCurrentPosition(posicao);
+  position = 0;
+  encoder->setPosition(position);
+  stepper.setCurrentPosition(position);
   Serial.println("Rotary and Stepper reseted to 0");
   digitalWrite(enablePin, LOW);
 }
