@@ -1,7 +1,32 @@
+/*
+ * Title       FocalizadorRotaryEncoder
+ * by          Regis Costa
+ *
+ * Copyright (C) 2021 Regis Costa
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Description:
+ *   
+ * Author: Regis Costa
+ *   regis@rsuzano.com
+ *
+ */
 /////////////////////////////////////////////////////////////////
 
 #include "Button2.h"; //  https://github.com/LennartHennigs/Button2
-#include <RotaryEncoder.h>
+#include <RotaryEncoder.h> //https://github.com/mathertel/RotaryEncoder
 #include <AccelStepper.h>
 
 /////////////////////////////////////////////////////////////////
@@ -20,7 +45,7 @@
 /////////////////////////////////////////////////////////////////
 
 Button2 b;
-// Setup a RotaryEncoder with 2 steps per latch for the 2 signal input pins:
+
 RotaryEncoder *encoder = nullptr;
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 /////////////////////////////////////////////////////////////////
@@ -41,7 +66,6 @@ encoder = new RotaryEncoder(PIN_IN1, PIN_IN2, RotaryEncoder::LatchMode::TWO03);
   stepper.setSpeed(900);
   Serial.begin(9600);
    
-  Serial.println("\n\nSimple Counter");
   
   b.begin(BUTTON_PIN);
   b.setTapHandler(click);
@@ -60,7 +84,7 @@ void loop() {
   int newPos = encoder->getPosition();
   
   now = millis();
-  //(lastTrigger > 0 && (now - lastTrigger) > 50)
+  
   if (pos != newPos) {
     int newDir = (int)(encoder->getDirection());
     Serial.print("pos:");
@@ -76,7 +100,7 @@ void loop() {
   b.loop();
 }
 
-/////////////////////////////////////////////////////////////////
+
 void doStep(){
   digitalWrite(enablePin, LOW);
    stepper.run();
@@ -87,15 +111,14 @@ void doStep(){
    }
     
 }
-// on change
+
 IRAM_ATTR void rotate() {
-    encoder->tick(); // just call tick() to check the state.   
+    encoder->tick(); 
     lastTrigger = millis();
     
 }
 
  
-// single click
 void click(Button2& btn) {
   if(microsteps==1){
     microsteps=8;
@@ -121,4 +144,4 @@ void resetPosition(Button2& btn) {
   digitalWrite(enablePin, LOW);
 }
 
-/////////////////////////////////////////////////////////////////
+
